@@ -4,13 +4,26 @@ from tkinter import filedialog as fd
 from PIL import Image as im
 from PIL import ImageTk as imtk
 from functools import partial
+from pathlib import Path
+
 
 import numpy as np
 
 def filePicker():
-    archivo = fd.askopenfilename(title="Selecciona una imagen", filetypes=[("Archivos BMP", "*.bmp")])
+    archivo = fd.askopenfilename(title="Selecciona una imagen", filetypes=[("Imagenes BMP", "*.bmp")])
     archivoNumero.delete(0, 'end')
     archivoNumero.insert(0, archivo)
+
+def pFilePicker():
+    # Mostrar el diálogo de selección de archivos
+    archivos = fd.askopenfilenames(
+        title="Selecciona las imagenes para el CFP",
+        filetypes=[("Imagenes BMP", "*.bmp")],
+        multiple=True
+    )
+    # Convertir las rutas a cadenas y devolver la lista
+    return [str(Path(path).absolute()) for path in archivos]
+
 
 def recuperacion(imagenRecuperada, digitos):
     # Getters de los datos para la prueba
@@ -41,7 +54,8 @@ def recuperacion(imagenRecuperada, digitos):
     panel.place(x = 150, y = 300)
 
     # Colocación en UI de la imagen recuperada y su numero
-    imagenRecuperada.set("El dígito es " + str(indice) if resultado else "No reconocido")
+    #imagenRecuperada.set("El dígito es " + str(indice) if resultado else "No reconocido")
+    imagenRecuperada.set("Digito reconocido " if resultado else "No reconocido")
     # Si se recupera una imagen del CFP
     if indice != -1:
         # Carga la imagen con el indice del patrón
@@ -75,13 +89,15 @@ def generarCFP(n):
     return arreglo_f
 
 if "__main__"==__name__:
-    digitos = [
-               "img/cero.bmp",
-               "img/uno.bmp", "img/dos.bmp",
-               "img/tres.bmp", "img/cuatro.bmp",
-               "img/cinco.bmp", "img/seis.bmp", 
-               "img/siete.bmp", "img/ocho.bmp", "img/nueve.bmp"
-            ]
+    
+    digitos = pFilePicker();
+    #digitos = [
+    #           "img/cero.bmp",
+    #           "img/uno.bmp", "img/dos.bmp",
+    #           "img/tres.bmp", "img/cuatro.bmp",
+    #           "img/cinco.bmp", "img/seis.bmp", 
+    #           "img/siete.bmp", "img/ocho.bmp", "img/nueve.bmp"
+    #        ]
     arreglo_x = [np.asarray(listInList(escalaGrises(np.asarray(im.open(numero))).tolist())) for numero in digitos]
     arreglo_y = generarCFP(len(digitos))
 
